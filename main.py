@@ -1,7 +1,7 @@
 from math import *
 from vpython import *
 
-##Iris
+##Iris Jiang
 
 ## Constants
 G = 6.6741e-11
