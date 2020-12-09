@@ -164,23 +164,6 @@ class Space:
     self.startText.set(["Pause","Start"][int((self.pause+1)/2)])
     
 
-
-<<<<<<< HEAD
 space = Space(root, canvas)
 space.loop()
 root.mainloop()
-=======
-while time < end:
-    rate(100)
-    time += dt
-    ## force on each body
-    updateForces(celestials)
-
-    ## There might be some finicky syntax with .mom and .pos for the sphere objects,
-    ## I'm not sure
-
-    ## update each body's momentum
-    updateMomenta(celestials, dt)
-    ## update each body's position
-    updatePositions(celestials, dt)
->>>>>>> master
