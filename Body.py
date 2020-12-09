@@ -47,7 +47,7 @@ class Body:
     return np.linalg.norm(self.position - pos) < self.radius/2
 
   def move(self, dt):
-    momentum = self.force * dt * 1e-10 # scale back down to render
+    momentum = self.force * dt * 1e-10**2 # scale back down to render
     self.velocity += momentum / self.mass
     self.position += self.velocity * dt
     
