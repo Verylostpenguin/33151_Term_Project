@@ -29,7 +29,7 @@ class Body:
   @staticmethod
   def pair_Gforce(body_pair, space):
     body1, body2 = body_pair
-    dpos = (body2.position - body1.position) * 1e10 # scaling is 1e10
+    dpos = (body2.position - body1.position)
     force = (dpos/np.linalg.norm(dpos)**3)*space.G*body1.mass*body2.mass
     body1.force += force
     body2.force -= force
@@ -37,7 +37,7 @@ class Body:
   @staticmethod
   def pair_Eforce(body_pair, space):
     body1, body2 = body_pair
-    dpos = (body2.position - body1.position) * 1e10  # scaling is 1e10
+    dpos = (body2.position - body1.position)
     force = (dpos/np.linalg.norm(dpos)**3)*space.k*body1.mass*body2.mass
     sign = body1.charge * body2.charge
     body1.force -= force * sign
@@ -46,10 +46,10 @@ class Body:
   def contains(self, pos):
     return np.linalg.norm(self.position - pos) < self.radius/2
 
-  def move(self):
-    acc = self.force/self.mass
-    self.velocity += acc
-    self.position += self.velocity
+  def move(self, dt):
+    momentum = self.force * dt * 1e-10 # scale back down to render
+    self.velocity += momentum / self.mass
+    self.position += self.velocity * dt
     
     self.canvas.move(self.id, self.velocity[0], self.velocity[1])
     self.force = np.array([0.0, 0.0])

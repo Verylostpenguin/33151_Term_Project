@@ -29,8 +29,12 @@ class Space:
     self.canvas.bind("<Button-1>", self.canvas_onleftclick)
     self.canvas.bind("<Button-3>", self.canvas_onrightclick)
     self.canvas.bind("<MouseWheel>", self.canvas_onmousewheel)
+    self.canvas.bind("<BackSpace>", self.canvas_onbackspace)
     self.centerX = 0
     self.centerY = 0
+
+    self.time = 0
+    self.dt = 10000
     
     self.startText = StringVar()
     self.startButton = Button(self.root, textvariable=self.startText, width=10,
@@ -50,6 +54,12 @@ class Space:
     self.secondText.set("Binary System")
     self.secondButton.grid(column=0, row=1, columnspan=2)
   
+  def loop(self):
+    if self.time < 3.15e8:
+      self.time += self.dt
+      self.moveBodies()
+      self.canvas.after(2, self.loop)
+
   def moveBodies(self):
     if not self.pause == -1:
       return
@@ -58,7 +68,7 @@ class Space:
       Body.pair_Gforce(pair, self)
     # Body.pair_EForce(pair, self) (electric force)
     for body in self.bodies:
-      body.move()
+      body.move(self.dt)
       body.updateVector()
   
   # TODO
@@ -85,10 +95,6 @@ class Space:
       accel[leaf.id] = leaf.g
     return accel """  
 
-  def loop(self):
-    self.moveBodies()
-    self.canvas.after(2, self.loop)
-
   def clickOnObject(self, event):
     for body in self.bodies:
         if body.contains(np.array([event.x, event.y])):
@@ -100,7 +106,7 @@ class Space:
     if self.selectedBody == None:
       if check == None:
         body = Body(self.canvas, np.array([event.x, event.y], dtype ="float64"),
-                    np.zeros(2), 5.9724e24, 5, len(self.bodies), "white", 1, self)
+                    np.zeros(2), 5.9724e24, 10, len(self.bodies), "white", 1, self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -136,22 +142,26 @@ class Space:
       self.canvas.itemconfig(self.selectedBody.id,outline = "white")
       self.selectedBody.updateVector()
 
+  def canvas_onbackspace(self, event):
+    if self.selectedBody != None:
+      self.canvas.delete(self.selectedBody)
+
   # Standard solar system preset
   # will spawn sun in center and all planets on the x-axis
   def preset1(self):
     for body in self.bodies:
-      canvas.delete(body)
+      self.canvas.delete(body)
     self.bodies = []
     with open("data/preset1.txt", "r") as preset1File:
       for line in preset1File.read().splitlines():
         data = line.split(",")
         angle = np.random.ranf() * 2 * math.pi
         posAng = np.array([math.cos(angle), math.sin(angle)], dtype="float64")
-        pos = float(data[1]) * posAng + np.array([600, 400], dtype="float64")
+        pos = float(data[1]) * posAng * 1e-10 + np.array([600, 400], dtype="float64")
         vecAng = np.array([math.cos(angle + math.pi), math.sin(angle + math.pi)], dtype="float64")
-        vel = float(data[2]) * vecAng
+        vel = float(data[2]) * vecAng * 1e-10
         planet = Body(self.canvas, pos, vel, float(data[0]),
-                      3, len(self.bodies), data[3], 1, self)
+                      5, len(self.bodies), data[3], 1, self)
         self.bodies.append(planet)
 
   def preset2(self):
@@ -163,7 +173,6 @@ class Space:
     self.pause *= -1
     self.startText.set(["Pause","Start"][int((self.pause+1)/2)])
     
-
 space = Space(root, canvas)
 space.loop()
 root.mainloop()
