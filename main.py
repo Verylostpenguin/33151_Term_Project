@@ -10,15 +10,15 @@ from Body import *
 root = Tk()
 root.title = "Solar System Simulator"
 
-# distance is scaled by a factor of 1 pixel is 10^10m
-# planets and sun will be same size (for clarity)
-canvas = Canvas(root, width=1200, height=800, bg = "black") 
+# Distance is scaled by a factor of 1 pixel = 10^10m
+# Planets and sun will be same size (for clarity)
+canvas = Canvas(root, width = 1200, height = 800, bg = "black") 
 canvas.grid(column = 2, row = 0, rowspan=20)
 
 class Space:
   def __init__(self, root, canvas, scale = 1, bodies = []):
     self.G = 6.6741e-11
-    self.k = 9e9
+    self.k = 8.9876e9
     self.canvas = canvas
     self.root = root
     self.scale = scale
@@ -37,22 +37,22 @@ class Space:
     self.dt = 10000
     
     self.startText = StringVar()
-    self.startButton = Button(self.root, textvariable=self.startText, width=10,
-                              bg="grey", command=self.canvas_pause)
+    self.startButton = Button(self.root, textvariable=  self.startText, width = 10,
+                              bg = "grey", command = self.canvas_pause)
     self.startText.set("Start")
-    self.startButton.grid(column=0, row=9, columnspan=2)
+    self.startButton.grid(column = 0, row = 9, columnspan = 2)
 
     self.firstText = StringVar()
-    self.firstButton = Button(self.root, textvariable=self.firstText, width=10,
-                              bg="grey", command=self.preset1)
+    self.firstButton = Button(self.root, textvariable = self.firstText, width = 10,
+                              bg = "grey", command = self.preset1)
     self.firstText.set("Solar System")
-    self.firstButton.grid(column=0, row=0, columnspan=2)
+    self.firstButton.grid(column = 0, row = 0, columnspan = 2)
 
     self.secondText = StringVar()
-    self.secondButton = Button(self.root, textvariable=self.secondText, width=10,
-                              bg="grey", command=self.preset2)
+    self.secondButton = Button(self.root, textvariable = self.secondText, width = 10,
+                              bg = "grey", command = self.preset2)
     self.secondText.set("Binary System")
-    self.secondButton.grid(column=0, row=1, columnspan=2)
+    self.secondButton.grid(column = 0, row = 1, columnspan = 2)
   
   def loop(self):
     if self.time < 3.15e8:
