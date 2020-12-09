@@ -149,8 +149,7 @@ class Space:
   # Standard solar system preset
   # will spawn sun in center and all planets on the x-axis
   def preset1(self):
-    for body in self.bodies:
-      self.canvas.delete(body)
+    self.canvas.delete("all")
     self.bodies = []
     with open("data/preset1.txt", "r") as preset1File:
       for line in preset1File.read().splitlines():
