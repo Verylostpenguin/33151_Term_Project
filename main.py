@@ -34,7 +34,7 @@ class Space:
     self.centerY = 0
 
     self.time = 0
-    self.dt = 10000
+    self.dt = 0.1
     
     self.startText = StringVar()
     self.startButton = Button(self.root, textvariable=  self.startText, width = 10,
@@ -58,7 +58,7 @@ class Space:
     if self.time < 3.15e8:
       self.time += self.dt
       self.moveBodies()
-      self.canvas.after(2, self.loop)
+      self.canvas.after(20, self.loop)
 
   def moveBodies(self):
     if not self.pause == -1:
@@ -66,34 +66,34 @@ class Space:
     bodies_pairs = list(itertools.combinations(self.bodies, 2))
     for pair in bodies_pairs:
       Body.pair_Gforce(pair, self)
-    # Body.pair_EForce(pair, self) (electric force)
+    # Body.pair_EForce(pair, self) (electric force) (gravity seems to always take precedence)
     for body in self.bodies:
       body.move(self.dt)
       body.updateVector()
   
   # TODO
   # BARNES-HUT ALGORITHM
-  """ def TreeWalk(self, node, node0, thetamax=0.7, G=1.0):
-    dx = node.COM - node0.COM
-    r = np.sqrt(np.sum(dx**2))
-    if r > 0:
-      if (len(node.children) == 0) or (node.size/r < thetamax):
-        node0.g += G * node.mass * dx/r**3
-      else:
-        for c in node.children:
-          self.TreeWalk(c, node0, thetamax, G)
+  # def TreeWalk(self, node, node0, thetamax=0.7, G=1.0):
+  #   dx = node.COM - node0.COM
+  #   r = np.sqrt(np.sum(dx**2))
+  #   if r > 0:
+  #     if (len(node.children) == 0) or (node.size/r < thetamax):
+  #       node0.g += G * node.mass * dx/r**3
+  #     else:
+  #       for c in node.children:
+  #         self.TreeWalk(c, node0, thetamax, G)
 
-  def GravAccel(self, points, masses, thetamax=0.7, G=1.):
-    center = (np.max(points, axis=0)+np.min(points, axis=0)) / 2
-    topsize = np.max(np.max(points, axis=0)-np.min(points, axis=0))
-    leaves = []
-    topnode = QuadNode(center, topsize, masses, points,
-                      np.arange(len(masses)), leaves)
-    accel = np.empty_like(points)
-    for i, leaf in enumerate(leaves):
-      self.TreeWalk(topnode, leaf, thetamax, G)
-      accel[leaf.id] = leaf.g
-    return accel """  
+  # def GravAccel(self, points, masses, thetamax=0.7, G=1.):
+  #   center = (np.max(points, axis=0)+np.min(points, axis=0)) / 2
+  #   topsize = np.max(np.max(points, axis=0)-np.min(points, axis=0))
+  #   leaves = []
+  #   topnode = QuadNode(center, topsize, masses, points,
+  #                     np.arange(len(masses)), leaves)
+  #   accel = np.empty_like(points)
+  #   for i, leaf in enumerate(leaves):
+  #     self.TreeWalk(topnode, leaf, thetamax, G)
+  #     accel[leaf.id] = leaf.g
+  #   return accel
 
   def clickOnObject(self, event):
     for body in self.bodies:
@@ -106,7 +106,7 @@ class Space:
     if self.selectedBody == None:
       if check == None:
         body = Body(self.canvas, np.array([event.x, event.y], dtype ="float64"),
-                    np.zeros(2), 5.9724e24, 10, len(self.bodies), "white", 1, self)
+                    np.zeros(2), 5.9724e24, 10, len(self.bodies), "white", 0, "", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -149,20 +149,28 @@ class Space:
   # Standard solar system preset
   # will spawn sun in center and all planets on the x-axis
   def preset1(self):
-    for body in self.bodies:
-      self.canvas.delete(body)
+    self.canvas.delete("all")
     self.bodies = []
     with open("data/preset1.txt", "r") as preset1File:
       for line in preset1File.read().splitlines():
-        data = line.split(",")
+        data = self.calculate(line)
         angle = np.random.ranf() * 2 * math.pi
         posAng = np.array([math.cos(angle), math.sin(angle)], dtype="float64")
-        pos = float(data[1]) * posAng * 1e-10 + np.array([600, 400], dtype="float64")
-        vecAng = np.array([math.cos(angle + math.pi), math.sin(angle + math.pi)], dtype="float64")
-        vel = float(data[2]) * vecAng * 1e-10
-        planet = Body(self.canvas, pos, vel, float(data[0]),
-                      5, len(self.bodies), data[3], 1, self)
+        pos = data[1] * posAng
+        vecAng = np.array([math.cos(angle + math.pi/2), math.sin(angle + math.pi/2)], dtype="float64")
+        vel = data[2] * vecAng
+        planet = Body(self.canvas, pos, vel, data[0],
+                      5, len(self.bodies), data[3], 1, data[4], self)
         self.bodies.append(planet)
+
+  def calculate(self, line):
+    velocityScale = 188/2.9780e4
+    massScale = 2.378e10/5.972e24
+    data = line.split(",")
+    velocity = float(data[2]) * velocityScale
+    mass = float(data[0]) * massScale
+
+    return [mass, float(data[1]) * 1e-10, velocity, data[3], data[4]]
 
   def preset2(self):
     # need to find some sort of stable binary system
