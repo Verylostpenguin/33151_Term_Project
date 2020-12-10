@@ -1,4 +1,3 @@
-#mass,pos,vel,color,planet
 1.9885e30,0,0,yellow,sun
 3.3011e23,5.7909e10,4.7362e4,gray,mercury
 4.8675e24,10.821e10,3.5020e4,brown,venus
