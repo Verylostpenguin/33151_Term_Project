@@ -106,7 +106,7 @@ class Space:
     if self.selectedBody == None:
       if check == None:
         body = Body(self.canvas, np.array([event.x, event.y], dtype="float64") - np.array([1280/2, 960/2], dtype="float64"),
-                    np.zeros(2), 1e13, 10, len(self.bodies), "white", 0, "", self)
+                    np.zeros(2), 1e13, 10, len(self.bodies), "white", 0, "collider", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -121,7 +121,7 @@ class Space:
         self.selectedBody = None
       else:
         dx,dy = (event.x - self.selectedBody.position[0]),(event.y - self.selectedBody.position[1])
-        self.selectedBody.velocity = [dx/10, dy/10]
+        self.selectedBody.mom = [dx*1e12, dy*1e12]
         self.selectedBody.updateVector()
         
   def canvas_onrightclick(self, event):
@@ -168,15 +168,11 @@ class Space:
     self.bodies = []
     with open("data/preset2.txt", "r") as preset2File:
       for line in preset2File.read().splitlines():
-        data = self.calculate(line)
-        angle = np.random.ranf() * 2 * math.pi * 0
-        posAng = np.array([math.cos(angle), math.sin(angle)], dtype="float64")
-        pos = data[1] * posAng
-        vecAng = np.array([math.cos(angle + math.pi/2),
-                           math.sin(angle + math.pi/2)], dtype="float64")
-        vel = data[2] * vecAng
-        planet = Body(self.canvas, pos, vel, data[0],
-                      5, len(self.bodies), data[3], 1, data[4], self)
+        data = line.split(",")
+        pos = np.array([float(data[1]), 0])
+        vel = np.array([0, float(data[2])])
+        planet = Body(self.canvas, pos, vel, float(data[0]),
+                      10, len(self.bodies), data[3], 1, data[4], self)
         self.bodies.append(planet)
 
   def calculate(self, line):

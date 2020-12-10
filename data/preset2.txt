@@ -1,6 +1,5 @@
-1.9885e30,10e10,0,yellow,sun1
-2e29,10e10,0,yellow,sun2
-1e25,40e10,1.3070e4,orange,planet1
-5e25,80e10,9.6800e3,gold,planet2
-1e26,120e10,6.8000e3,green,planet3
-5e26,160e10,5.4300e3,blue,planet4
+3e14,-25,10,yellow,sun1
+1e14,25,-10,yellow,sun2
+1e12,100,-10,green,planet1
+1e12,-100,24,green,planet2
+1e13,-200,15,green,planet2
