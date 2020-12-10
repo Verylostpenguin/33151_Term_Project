@@ -19,7 +19,7 @@ class Body:
     self.realVel = vel
     self.mom = mass * vel
     self.velocity = vel * self.scale
-    self.position = pos * self.scale + np.array([600, 400], dtype="float64")
+    self.position = pos * self.scale + np.array([1920/2, 1080/2], dtype="float64")
     self.force = np.array([0.0, 0.0])
 
     self.id = canvas.create_oval(self.position[0] - radius, self.position[1] - radius, self.position[0] + radius, 
@@ -63,8 +63,8 @@ class Body:
     self.realPos += self.realVel * dt
     self.position = self.realPos * self.scale
 
-    self.canvas.coords(self.id, int(self.position[0] - self.radius) + 600, int(self.position[1] - self.radius) + 400,
-                       int(self.position[0] + self.radius) + 600, int(self.position[1] + self.radius) + 400)
+    self.canvas.coords(self.id, int(self.position[0] - self.radius) + 1920/2, int(self.position[1] - self.radius) + 1080/2,
+                       int(self.position[0] + self.radius) + 1920/2, int(self.position[1] + self.radius) + 1080/2)
     self.force = np.zeros(2)
       
   def updateVector(self):
