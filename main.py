@@ -10,9 +10,9 @@ from Body import *
 root = Tk()
 root.title = "Solar System Simulator"
 
-# Distance is scaled by a factor of 1 pixel = 10^10m
-# Planets and sun will be same size (for clarity)
-canvas = Canvas(root, width = 1200, height = 800, bg = "black") 
+# distance is scaled by a factor of 1 pixel is 10^10m
+# planets and sun will be same size (for clarity)
+canvas = Canvas(root, width=1200, height=1000, bg = "black") 
 canvas.grid(column = 2, row = 0, rowspan=20)
 
 class Space:
@@ -164,8 +164,8 @@ class Space:
         self.bodies.append(planet)
 
   def calculate(self, line):
-    velocityScale = 188/2.9780e4
-    massScale = 2.378e10/5.972e24
+    velocityScale = 18.8/2.9780e4
+    massScale = 4e-17
     data = line.split(",")
     velocity = float(data[2]) * velocityScale
     mass = float(data[0]) * massScale
