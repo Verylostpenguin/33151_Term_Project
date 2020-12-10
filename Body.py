@@ -13,10 +13,16 @@ class Body:
     self.name = name
     self.charge = charge # Can add later
     self.selected = False
+    self.noDraw = False
 
     self.mom = mass * vel
     self.velocity = vel
-    self.position = pos + np.array([1280/2, 960/2], dtype="float64")
+
+    if name == "collider":
+      self.position = pos
+    else:
+      self.position = pos + np.array([1280/2, 960/2], dtype="float64")
+
     self.force = np.array([0.0, 0.0])
 
     self.id = canvas.create_oval(self.position[0] - radius, self.position[1] - radius, self.position[0] + radius, 
@@ -62,14 +68,17 @@ class Body:
       
   def updateVector(self):
     self.canvas.delete(self.lineID)
-    self.lineID = self.canvas.create_line(self.position[0],self.position[1],self.position[0]+self.velocity[0],
-                                          self.position[1]+self.velocity[1], fill = "white")
+    if not self.noDraw:
+      self.lineID = self.canvas.create_line(self.position[0],self.position[1],self.position[0]+ 1/(self.mass) * self.mom[0],
+                                            self.position[1]+ 1/(self.mass) * self.mom[1], fill = "white")
 
   def updateShape(self, delete=False, mass=None):
     if delete:
-      self.deleteBody
+      self.deleteBody()
     if mass != None:
       self.mass += mass
 
   def deleteBody(self):
     self.canvas.delete(self.id) 
+    self.noDraw = True
+    self.canvas.delete(self.lineID)

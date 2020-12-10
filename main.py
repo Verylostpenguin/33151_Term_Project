@@ -51,6 +51,12 @@ class Space:
                               bg = "grey", command = self.preset2)
     self.secondText.set("Binary System")
     self.secondButton.grid(column = 0, row = 1, columnspan = 2)
+
+    self.clearText = StringVar()
+    self.clearButton = Button(self.root, textvariable = self.clearText, width = 10,
+                              bg = "grey", command = self.clearAll)
+    self.clearText.set("Clear All")
+    self.clearButton.grid(column = 0, row = 2, columnspan = 2)
   
   def loop(self):
     self.moveBodies()
@@ -99,8 +105,8 @@ class Space:
     check = self.clickOnObject(event)
     if self.selectedBody == None:
       if check == None:
-        body = Body(self.canvas, np.array([event.x, event.y], dtype="float64") - np.array([1280/2, 960/2], dtype="float64"),
-                    np.zeros(2), 1e13, 10, len(self.bodies), "white", 0, "collider", self)
+        body = Body(self.canvas, np.array([event.x, event.y], dtype="float64"),
+                    np.zeros(2), 1e14, 10, len(self.bodies), "white", 0, "collider", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -115,30 +121,32 @@ class Space:
         self.selectedBody = None
       else:
         dx,dy = (event.x - self.selectedBody.position[0]),(event.y - self.selectedBody.position[1])
-        self.selectedBody.mom = [dx*1e12, dy*1e12]
+        self.selectedBody.mom = [dx*5e13, dy*5e13]
         self.selectedBody.updateVector()
         
   def canvas_onrightclick(self, event):
     check = self.clickOnObject(event)
     if self.selectedBody == None:
       if check != None:
-        check.updateShape(flipCharge=True)
+        check.updateShape(delete=True)
     else:
       if self.selectedBody == check:
-        check.updateShape(flipCharge=True)
+        check.updateShape(delete=True)
       else:
         self.selectedBody.velocity = [0, 0]
         self.selectedBody.updateVector()
 
   def canvas_onmousewheel(self, event):
     if self.selectedBody != None:
-      self.selectedBody.updateShape(mass=1e12)
+      self.selectedBody.updateShape(mass=1e24)
       self.canvas.itemconfig(self.selectedBody.id,outline = "white")
       self.selectedBody.updateVector()
 
   def canvas_onbackspace(self, event):
     if self.selectedBody != None:
-      self.canvas.delete(self.selectedBody)
+      self.selectedBody.deleteBody()
+      self.bodies.remove(self.selectedBody)
+      self.selectedBody = None
 
   # Standard solar system preset
   # will spawn sun in center and all planets on the x-axis
@@ -177,6 +185,12 @@ class Space:
     mass = float(data[0]) * massScale
 
     return [mass, float(data[1]) * 1e-10, velocity, data[3], data[4]]
+
+  def clearAll(self):
+    for body in self.bodies:
+      body.deleteBody()
+      
+    self.bodies = []
 
   def canvas_pause(self):
     self.pause *= -1
