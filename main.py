@@ -32,8 +32,6 @@ class Space:
     self.canvas.bind("<BackSpace>", self.canvas_onbackspace)
     self.centerX = 0
     self.centerY = 0
-
-    self.time = 0
     self.dt = 0.1
     
     self.startText = StringVar()
@@ -55,10 +53,8 @@ class Space:
     self.secondButton.grid(column = 0, row = 1, columnspan = 2)
   
   def loop(self):
-    if self.time < 100:
-      self.time += self.dt
-      self.moveBodies()
-      self.canvas.after(20, self.loop)
+    self.moveBodies()
+    self.canvas.after(20, self.loop)
 
   def moveBodies(self):
     if not self.pause == -1:
@@ -70,30 +66,28 @@ class Space:
     for body in self.bodies:
       body.move(self.dt)
       body.updateVector()
-  
-  # TODO
-  # BARNES-HUT ALGORITHM
-  # def TreeWalk(self, node, node0, thetamax=0.7, G=1.0):
-  #   dx = node.COM - node0.COM
-  #   r = np.sqrt(np.sum(dx**2))
-  #   if r > 0:
-  #     if (len(node.children) == 0) or (node.size/r < thetamax):
-  #       node0.g += G * node.mass * dx/r**3
-  #     else:
-  #       for c in node.children:
-  #         self.TreeWalk(c, node0, thetamax, G)
 
-  # def GravAccel(self, points, masses, thetamax=0.7, G=1.):
-  #   center = (np.max(points, axis=0)+np.min(points, axis=0)) / 2
-  #   topsize = np.max(np.max(points, axis=0)-np.min(points, axis=0))
-  #   leaves = []
-  #   topnode = QuadNode(center, topsize, masses, points,
-  #                     np.arange(len(masses)), leaves)
-  #   accel = np.empty_like(points)
-  #   for i, leaf in enumerate(leaves):
-  #     self.TreeWalk(topnode, leaf, thetamax, G)
-  #     accel[leaf.id] = leaf.g
-  #   return accel
+  def TreeWalk(self, node, node0, thetamax=0.7, G=1.0):
+    dx = node.COM - node0.COM
+    r = np.sqrt(np.sum(dx**2))
+    if r > 0:
+      if (len(node.children) == 0) or (node.size/r < thetamax):
+        node0.g += G * node.mass * dx/r**3
+      else:
+        for c in node.children:
+          self.TreeWalk(c, node0, thetamax, G)
+
+  def GravAccel(self, points, masses, thetamax=0.7, G=1.):
+    center = (np.max(points, axis=0)+np.min(points, axis=0)) / 2
+    topsize = np.max(np.max(points, axis=0)-np.min(points, axis=0))
+    leaves = []
+    topnode = QuadNode(center, topsize, masses, points,
+                      np.arange(len(masses)), leaves)
+    accel = np.empty_like(points)
+    for i, leaf in enumerate(leaves):
+      self.TreeWalk(topnode, leaf, thetamax, G)
+      accel[leaf.id] = leaf.g
+    return accel
 
   def clickOnObject(self, event):
     for body in self.bodies:
