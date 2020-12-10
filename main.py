@@ -12,7 +12,7 @@ root.title = "Solar System Simulator"
 
 # distance is scaled by a factor of 1 pixel is 10^10m
 # planets and sun will be same size (for clarity)
-canvas = Canvas(root, width=1200, height=1000, bg = "black") 
+canvas = Canvas(root, width=1920, height=1080, bg = "black") 
 canvas.grid(column = 2, row = 0, rowspan=20)
 
 class Space:
@@ -106,7 +106,7 @@ class Space:
     if self.selectedBody == None:
       if check == None:
         body = Body(self.canvas, np.array([event.x, event.y], dtype ="float64"),
-                    np.zeros(2), 5.9724e24, 10, len(self.bodies), "white", 0, "", self)
+                    np.zeros(2), 1e10, 10, len(self.bodies), "white", 0, "", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
