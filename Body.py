@@ -13,13 +13,10 @@ class Body:
     self.name = name
     self.charge = charge # Can add later
     self.selected = False
-    
-    self.scale = 1
-    self.realPos = pos
-    self.realVel = vel
+
     self.mom = mass * vel
-    self.velocity = vel * self.scale
-    self.position = pos * self.scale + np.array([1920/2, 1080/2], dtype="float64")
+    self.velocity = vel
+    self.position = pos + np.array([1280/2, 960/2], dtype="float64")
     self.force = np.array([0.0, 0.0])
 
     self.id = canvas.create_oval(self.position[0] - radius, self.position[1] - radius, self.position[0] + radius, 
@@ -37,7 +34,7 @@ class Body:
   @staticmethod
   def pair_Gforce(body_pair, space):
     body1, body2 = body_pair
-    dpos = (body2.realPos - body1.realPos)
+    dpos = (body2.position - body1.position)
     force = (dpos/np.linalg.norm(dpos)**3)*space.G*body1.mass*body2.mass
     body1.force += force
     body2.force -= force
@@ -56,30 +53,23 @@ class Body:
 
   def move(self, dt):
     self.mom += self.force * dt
-    
-    self.realVel = self.mom / self.mass
-    self.velocity = self.realVel * self.scale
+    self.velocity = self.mom / self.mass
+    self.position += self.velocity * dt
 
-    self.realPos += self.realVel * dt
-    self.position = self.realPos * self.scale
-
-    self.canvas.coords(self.id, int(self.position[0] - self.radius) + 1920/2, int(self.position[1] - self.radius) + 1080/2,
-                       int(self.position[0] + self.radius) + 1920/2, int(self.position[1] + self.radius) + 1080/2)
+    self.canvas.coords(self.id, int(self.position[0] - self.radius), int(self.position[1] - self.radius),
+                       int(self.position[0] + self.radius), int(self.position[1] + self.radius))
     self.force = np.zeros(2)
       
   def updateVector(self):
     self.canvas.delete(self.lineID)
-    self.lineID = self.canvas.create_line(self.position[0],self.position[1],self.position[0]+10*self.velocity[0],
-                                          self.position[1]+10*self.mom[1], fill = "white")
+    self.lineID = self.canvas.create_line(self.position[0],self.position[1],self.position[0]+self.velocity[0],
+                                          self.position[1]+self.velocity[1], fill = "white")
 
-  def updateShape(self, flipCharge=False, mass=None):
-    if flipCharge:
-      self.charge *= -1
-    if mass != None:
-      self.mass = mass
+  def updateShape(self, delete=False, mass=None):
+    if delete:
       self.deleteBody
-    color = "red" if self.charge == 1 else "blue"
-    self.canvas.itemconfig(self.id, outline = color)
+    if mass != None:
+      self.mass += mass
 
   def deleteBody(self):
     self.canvas.delete(self.id) 

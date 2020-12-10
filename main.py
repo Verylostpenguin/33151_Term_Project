@@ -12,7 +12,7 @@ root.title = "Solar System Simulator"
 
 # distance is scaled by a factor of 1 pixel is 10^10m
 # planets and sun will be same size (for clarity)
-canvas = Canvas(root, width=1920, height=1080, bg = "black") 
+canvas = Canvas(root, width=1280, height=960, bg = "black") 
 canvas.grid(column = 2, row = 0, rowspan=20)
 
 class Space:
@@ -55,7 +55,7 @@ class Space:
     self.secondButton.grid(column = 0, row = 1, columnspan = 2)
   
   def loop(self):
-    if self.time < 3.15e8:
+    if self.time < 100:
       self.time += self.dt
       self.moveBodies()
       self.canvas.after(20, self.loop)
@@ -105,8 +105,8 @@ class Space:
     check = self.clickOnObject(event)
     if self.selectedBody == None:
       if check == None:
-        body = Body(self.canvas, np.array([event.x, event.y], dtype ="float64"),
-                    np.zeros(2), 1e10, 10, len(self.bodies), "white", 0, "", self)
+        body = Body(self.canvas, np.array([event.x, event.y], dtype="float64") - np.array([1280/2, 960/2], dtype="float64"),
+                    np.zeros(2), 1e13, 10, len(self.bodies), "white", 0, "", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -138,7 +138,7 @@ class Space:
 
   def canvas_onmousewheel(self, event):
     if self.selectedBody != None:
-      self.selectedBody.updateShape(mass=1e30)
+      self.selectedBody.updateShape(mass=1e12)
       self.canvas.itemconfig(self.selectedBody.id,outline = "white")
       self.selectedBody.updateVector()
 
@@ -163,6 +163,22 @@ class Space:
                       5, len(self.bodies), data[3], 1, data[4], self)
         self.bodies.append(planet)
 
+  def preset2(self):
+    self.canvas.delete("all")
+    self.bodies = []
+    with open("data/preset2.txt", "r") as preset2File:
+      for line in preset2File.read().splitlines():
+        data = self.calculate(line)
+        angle = np.random.ranf() * 2 * math.pi * 0
+        posAng = np.array([math.cos(angle), math.sin(angle)], dtype="float64")
+        pos = data[1] * posAng
+        vecAng = np.array([math.cos(angle + math.pi/2),
+                           math.sin(angle + math.pi/2)], dtype="float64")
+        vel = data[2] * vecAng
+        planet = Body(self.canvas, pos, vel, data[0],
+                      5, len(self.bodies), data[3], 1, data[4], self)
+        self.bodies.append(planet)
+
   def calculate(self, line):
     velocityScale = 18.8/2.9780e4
     massScale = 4e-17
@@ -171,11 +187,6 @@ class Space:
     mass = float(data[0]) * massScale
 
     return [mass, float(data[1]) * 1e-10, velocity, data[3], data[4]]
-
-  def preset2(self):
-    # need to find some sort of stable binary system
-    # and scale it properly
-    pass
 
   def canvas_pause(self):
     self.pause *= -1
