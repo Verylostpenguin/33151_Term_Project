@@ -106,7 +106,7 @@ class Space:
     if self.selectedBody == None:
       if check == None:
         body = Body(self.canvas, np.array([event.x, event.y], dtype="float64"),
-                    np.zeros(2), 1e14, 10, len(self.bodies), "white", 0, "collider", self)
+                    np.zeros(2), 1e10, 10, len(self.bodies), "white", 0, "collider", self)
         if self.selectedBody != None:
           self.selectedBody = None
         self.bodies.append(body)
@@ -121,7 +121,7 @@ class Space:
         self.selectedBody = None
       else:
         dx,dy = (event.x - self.selectedBody.position[0]),(event.y - self.selectedBody.position[1])
-        self.selectedBody.mom = [dx*5e13, dy*5e13]
+        self.selectedBody.mom = [dx*5e9, dy*5e9]
         self.selectedBody.updateVector()
         
   def canvas_onrightclick(self, event):
@@ -133,12 +133,12 @@ class Space:
       if self.selectedBody == check:
         check.updateShape(delete=True)
       else:
-        self.selectedBody.velocity = [0, 0]
+        self.selectedBody.mom = [0, 0]
         self.selectedBody.updateVector()
 
   def canvas_onmousewheel(self, event):
     if self.selectedBody != None:
-      self.selectedBody.updateShape(mass=1e24)
+      self.selectedBody.updateShape(mass=1e15)
       self.canvas.itemconfig(self.selectedBody.id,outline = "white")
       self.selectedBody.updateVector()
 
